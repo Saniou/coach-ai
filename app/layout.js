@@ -6,8 +6,13 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes"
 
 export const metadata = {
-  title: "SansAi",
+  title: "SensAi",
   description: "Gen your future with sinsay",
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+    shortcut: '/logo.png'
+  }
 };
 
 const inter = Inter({ subsets: ["latin"] })

@@ -23,7 +23,6 @@ import { testimonial } from "@/data/testimonial";
 import { faqs } from "@/data/faqs";
 import { howItWorks } from "@/data/howltWorks";
 
-
 export default function Home() {
   return (
     <div>
