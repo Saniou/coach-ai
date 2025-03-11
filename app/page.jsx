@@ -27,9 +27,6 @@ export default function Home() {
   return (
     <div>
       <div>
-        {/* <div className="grid-background">
-          <MoleculeCanvas />
-        </div> */}
         <HeroSection />
 
         <section className="w-full py-12 md:py-24 lg:py-32 bg-transparent">
