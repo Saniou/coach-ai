@@ -86,7 +86,7 @@ const OnboardingForm = ({ industries }) => {
   }, [updateResult, updateLoading, router]);
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center pt-[100px]">
       <Card className='w-full max-w-lg mt-10 mx-2'>
         <CardHeader>
           <CardTitle className='gradient-title text-4xl'>Complete Your Profile</CardTitle>

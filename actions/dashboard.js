@@ -3,6 +3,7 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { redirect } from 'next/navigation';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -40,35 +41,44 @@ export async function getIndustryInsights() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
+  // Спочатку отримуємо користувача
   const user = await db.user.findUnique({
     where: { clerkUserId: userId },
-    include: {
-      industryInsight: true,
-    },
+    include: { industryInsight: true },
   });
 
   if (!user) throw new Error("User not found");
 
-  // If no insights exist, generate them
-  if (!user.industryInsight) {
-    const insights = await generateAIInsights(user.industry);
-
-    const industryInsight = await db.industryInsight.create({
-      data: {
-        industry: user.industry,
-        salaryRanges: [],
-        growthRate: 0,
-        demandLevel: "MEDIUM",
-        topSkills: [],
-        marketOutlook: "NEUTRAL",
-        keyTrends: [],
-        recommendedSkills: [],
-        nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      },
-    });
-
-    return industryInsight;
+  // Якщо у користувача немає вказаної індустрії, перенаправляємо його на /onboarding
+  if (!user.industry) {
+    redirect('/onboarding');
   }
 
-  return user.industryInsight;
+  // Шукаємо аналітику за індустрією
+  const existingInsight = await db.industryInsight.findUnique({
+    where: { industry: user.industry },
+  });
+
+  if (existingInsight) {
+    return existingInsight;
+  }
+
+  // Якщо інсайту немає, генеруємо нові дані
+  const insights = await generateAIInsights(user.industry);
+
+  const industryInsight = await db.industryInsight.create({
+    data: {
+      industry: user.industry,
+      salaryRanges: [],
+      growthRate: 0,
+      demandLevel: "MEDIUM",
+      topSkills: [],
+      marketOutlook: "NEUTRAL",
+      keyTrends: [],
+      recommendedSkills: [],
+      nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Додаємо 7 днів
+    },
+  });
+
+  return industryInsight;
 }
